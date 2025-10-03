@@ -7,7 +7,7 @@ public class GameManager : Singleton<GameManager>
 
     private Mon_Tomato mon;
 
-    public int gold;
+    private int gold;
 
     public int simTurn;
 
@@ -32,6 +32,7 @@ public class GameManager : Singleton<GameManager>
     public void SetMonsterStatus()
     {
         uiManager.SetTextStatus(mon.hp, mon.atk, mon.def, mon.tec, mon.spd);
+        uiManager.SetTextGold(gold);
     }
 
     public void OnTraining(int trainingType)
