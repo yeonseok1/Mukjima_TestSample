@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public static int gold;
+    public int gold;
 
     void Start()
     {
