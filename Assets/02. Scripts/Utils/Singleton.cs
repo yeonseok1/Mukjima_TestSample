@@ -25,9 +25,8 @@ public abstract class Singleton<T> : MonoBehaviour where T : Component
 
     private void Awake()
     {
-        if (_instance == null)
+        if (Instance != null)
         {
-            _instance = this as T;
             DontDestroyOnLoad(gameObject);
             // 씬 전환시 호출되는 액션 메서드 할당
             SceneManager.sceneLoaded += OnSceneLoad;
