@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private GameManager gameManager;
+    [SerializeField] private SimulationManager simulationManager;
 
     [SerializeField] private TextMeshProUGUI hp_Text;
     [SerializeField] private TextMeshProUGUI atk_Text;
@@ -15,6 +15,10 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameObject ui_Simulation;
     [SerializeField] private GameObject ui_Training;
+
+    [SerializeField] private GameObject ui_PopTraining;
+    [SerializeField] private GameObject text_Training;
+    [SerializeField] private GameObject button_EndTraining;
 
     public void SetTextStatus(int hp, int atk, int def, int tec, int spd)
     {
@@ -44,6 +48,32 @@ public class UIManager : MonoBehaviour
 
     public void OnClickTrainingButton(int trainingType)
     {
-        gameManager.OnTraining(trainingType);
+        GameManager.Instance.SetTraining(trainingType);
     }
+
+    public void OnTrainingUI()
+    {
+        // TODO: UI연출 코루틴화
+        UITrainingRoutine();
+    }
+
+    private void UITrainingRoutine()
+    {
+        ui_PopTraining.SetActive(true);
+        button_EndTraining.SetActive(true);
+    }
+
+    public void OnClickTrainingEnd()
+    {
+        button_EndTraining.SetActive(false);
+        ui_PopTraining.SetActive(false);
+        simulationManager.isEndTurn = true;
+    }
+
+    public void OnClickWorkingButton()
+    {
+        GameManager.Instance.SetWorking();
+    }
+
+    
 }

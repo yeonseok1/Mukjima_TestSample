@@ -13,10 +13,9 @@ public class Mon_Tomato : MonoBehaviour
 
     private int lv = 0;
 
-    private void OnEnable()
+    void OnEnable()
     {
         GameManager.Instance.SetMonster(this);
-        GameManager.Instance.InitMonster();
     }
 
     public void SetGrowUp()
