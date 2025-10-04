@@ -5,14 +5,20 @@ public class SimulationManager : MonoBehaviour
 {
     [SerializeField] private UIManager uiManager;
 
-    public int simTurn;
-    public int[] trainingLevel = { 1, 1, 1, 1, 1 };
-    public int[] trainingCount = { 0, 0, 0, 0, 0 };
-    public int[] trainingCost = { 30, 50, 70, 90, 110 };
+    private int simTurn;
+    private int[] trainingLevel = { 1, 1, 1, 1, 1 };
+    private int[] trainingCount = { 0, 0, 0, 0, 0 };
+    private int[] trainingCost = { 30, 50, 70, 90, 110 };
 
-    public bool isEndTurn = false;
+    private bool endTurnFlag = false;
 
     private bool isTraining = false;
+
+    void Start()
+    {
+        simTurn = 1;
+        uiManager.SetTextTurn(simTurn);
+    }
 
     private void StartTurn()
     {
@@ -24,30 +30,38 @@ public class SimulationManager : MonoBehaviour
     {
         GameManager.Instance.SetUIMonsterStatus();
         simTurn++;
-        isEndTurn = false;
+        uiManager.SetTextTurn(simTurn);
+        endTurnFlag = false;
         //StartTurn();
+    }
+
+    public void EndTurnFlagChange()
+    {
+        endTurnFlag = !endTurnFlag;
     }
 
     public void OnTraining(int trainingType, Mon_Tomato mon)
     {
-        // 돈이 없다면
-        if (GameManager.Instance.gold < trainingCost[trainingLevel[trainingType] - 1])
-        {
-            // TODO: UI를 띄우고 훈련 취소
-            return;
-        }
-
         // 훈련 중이라면
         if (isTraining)
             return;
+
+        int cost = trainingCost[trainingLevel[trainingType] - 1];
+        // 돈이 없다면
+        if (GameManager.Instance.gold < cost)
+        {
+            // TODO: UI를 띄우고 훈련 취소
+            Debug.Log($"돈이 부족함...필요금액:{cost}");
+            return;
+        }
+        GameManager.Instance.SetGold(-cost);
 
         StartCoroutine(TrainingRoutine(trainingType, mon));
     }
 
     public void OnWorking()
     {
-        GameManager.Instance.gold += 50;
-        uiManager.SetTextGold(GameManager.Instance.gold);
+        GameManager.Instance.SetGold(50);
         EndTurn();
     }
 
@@ -56,60 +70,55 @@ public class SimulationManager : MonoBehaviour
         isTraining = true;
         // TODO: 코루틴 적용과 훈련중&종료 팝업UI
 
+        // 트레이닝 성공 대성공 판정 -> 대성공시 스탯 증가 1.5배로
+        // 조정이 없다면 확률은 10%
+        bool isPerfect = UnityEngine.Random.Range(0, 100) < 10;
 
-        // TODO: 트레이닝 성공 대성공 판정
-        int rNum = UnityEngine.Random.Range(0, 10);
-
-        int val = 1;
-        int temp;
+        int val = 1 + trainingLevel[trainingType];
+        if (isPerfect)
+            val += val >> 1;
+        int temp = 0;
+        string trainingStatus = "";
 
         switch (trainingType)
         {
             case 0:
                 temp = mon.hp;
-                mon.hp += val + trainingLevel[trainingType];
+                trainingStatus = "체력";
+                mon.hp += val;
                 break;
             case 1:
                 temp = mon.atk;
-                mon.atk += val + trainingLevel[trainingType];
+                trainingStatus = "공격";
+                mon.atk += val;
                 break;
             case 2:
                 temp = mon.def;
-                mon.def += val + trainingLevel[trainingType];
+                trainingStatus = "방어";
+                mon.def += val;
                 break;
             case 3:
                 temp = mon.tec;
-                mon.tec += val + trainingLevel[trainingType];
+                trainingStatus = "솜씨";
+                mon.tec += val;
                 break;
             case 4:
                 temp = mon.spd;
-                mon.spd += val + trainingLevel[trainingType];
+                trainingStatus = "속도";
+                mon.spd += val;
                 break;
         }
 
+        // 트레이닝 횟수 & 레벨
         trainingCount[trainingType]++;
         if ((trainingCount[trainingType] % 3 == 0) && trainingLevel[trainingType] <= 5)
             trainingLevel[trainingType]++;
 
-        // 훈련중 연출
-        Debug.Log("훈련 중...");
-        
-        yield return new WaitForSeconds(1.5f);
+        uiManager.OnTrainingUI(isPerfect, val, temp, trainingStatus);
 
-        // 성공 대성공 연출
-        Debug.Log($"훈련 성공!! 능력치가 {val + trainingLevel[trainingType]} 올랐습니다");
+        yield return new WaitUntil(() => endTurnFlag);
 
-        GameManager.Instance.SetUIMonsterStatus();
-        yield return new WaitForSeconds(0.5f);
-
-
-        // 훈련 성공 팝업에 훈련 완료 버튼 활성화
-        uiManager.OnTrainingUI();
-
-
-        yield return new WaitUntil(() => isEndTurn);
         isTraining = false;
-
         EndTurn();
     }
 

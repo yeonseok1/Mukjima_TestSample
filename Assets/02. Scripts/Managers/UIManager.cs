@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -17,8 +18,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject ui_Training;
 
     [SerializeField] private GameObject ui_PopTraining;
-    [SerializeField] private GameObject text_Training;
     [SerializeField] private GameObject button_EndTraining;
+
+    public void SetTextTurn(int simTurn)
+    {
+        turn_Text.text = $"{simTurn}";
+    }
 
     public void SetTextStatus(int hp, int atk, int def, int tec, int spd)
     {
@@ -51,15 +56,19 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.SetTraining(trainingType);
     }
 
-    public void OnTrainingUI()
+    public void OnTrainingUI(bool isPerfect, int val, int temp, string trainingStatus)
     {
         // TODO: UI연출 코루틴화
-        UITrainingRoutine();
+        StartCoroutine(UITrainingRoutine(isPerfect, val, temp, trainingStatus));
     }
 
-    private void UITrainingRoutine()
+    private IEnumerator UITrainingRoutine(bool isPerfect, int val, int temp, string trainingStatus)
     {
         ui_PopTraining.SetActive(true);
+
+        GameManager.Instance.SetUIMonsterStatus();
+
+        yield return new WaitForSeconds(1f);
         button_EndTraining.SetActive(true);
     }
 
@@ -67,7 +76,7 @@ public class UIManager : MonoBehaviour
     {
         button_EndTraining.SetActive(false);
         ui_PopTraining.SetActive(false);
-        simulationManager.isEndTurn = true;
+        simulationManager.EndTurnFlagChange();
     }
 
     public void OnClickWorkingButton()

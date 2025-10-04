@@ -12,10 +12,8 @@ public class GameManager : Singleton<GameManager>
 
     void Start()
     {
-
         // TODO: 골드 정보 초기화
-        gold = 100;
-        uiManager.SetTextGold(gold);
+        SetGold(100);
     }
 
     public int GetGold()
@@ -26,6 +24,7 @@ public class GameManager : Singleton<GameManager>
     public void SetGold(int setGold)
     {
         gold += setGold;
+        uiManager.SetTextGold(gold);
     }
 
 
