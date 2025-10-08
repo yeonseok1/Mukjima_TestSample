@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameObject ui_PopTraining;
     [SerializeField] private GameObject button_EndTraining;
+    [SerializeField] private TextMeshProUGUI text_PopTraining;
 
     public void SetTextTurn(int simTurn)
     {
@@ -58,17 +59,23 @@ public class UIManager : MonoBehaviour
 
     public void OnTrainingUI(bool isPerfect, int val, int temp, string trainingStatus)
     {
-        // TODO: UI연출 코루틴화
         StartCoroutine(UITrainingRoutine(isPerfect, val, temp, trainingStatus));
     }
 
     private IEnumerator UITrainingRoutine(bool isPerfect, int val, int temp, string trainingStatus)
     {
         ui_PopTraining.SetActive(true);
-
-        GameManager.Instance.SetUIMonsterStatus();
+        text_PopTraining.text = "훈련중...";
 
         yield return new WaitForSeconds(1f);
+
+        text_PopTraining.text = isPerfect ? "훈련 대성공!!" : "훈련 성공!";
+
+        yield return new WaitForSeconds(1f);
+
+        GameManager.Instance.SetUIMonsterStatus();
+        text_PopTraining.text += $"\n{trainingStatus} : {temp} -> {temp + val}";
+
         button_EndTraining.SetActive(true);
     }
 

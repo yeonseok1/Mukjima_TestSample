@@ -118,6 +118,7 @@ public class SimulationManager : MonoBehaviour
 
         yield return new WaitUntil(() => endTurnFlag);
 
+        uiManager.OnClickTrainingBackButton();
         isTraining = false;
         EndTurn();
     }

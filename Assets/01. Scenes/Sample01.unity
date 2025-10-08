@@ -738,6 +738,7 @@ MonoBehaviour:
   ui_Training: {fileID: 196964427}
   ui_PopTraining: {fileID: 1315757100}
   button_EndTraining: {fileID: 1978733066}
+  text_PopTraining: {fileID: 1757364036}
 --- !u!1 &266102425
 GameObject:
   m_ObjectHideFlags: 0
